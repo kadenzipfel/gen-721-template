@@ -17,7 +17,7 @@ app.engine(
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-  res.render("main", { scriptName: "index.ts" });
+  res.render("main", { scriptName: "index.js" });
 });
 
 app.listen(port, () => {
