@@ -59,4 +59,8 @@ contract Gen721 is CustomERC721Metadata, Ownable {
         }
         return string(bytesArray);
     }
+
+    function withdraw() public onlyOwner {
+        require(payable(msg.sender).send(address(this).balance));
+    }
 }   
