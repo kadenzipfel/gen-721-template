@@ -71,4 +71,10 @@ describe("Gen721", () => {
       })
     ).to.be.reverted;
   });
+
+  it("returns correct tokenURI", async () => {
+    await Gen721.connect(user).mint(1, { value: MINT_PRICE });
+    const tokenURI = await Gen721.tokenURI(0);
+    expect(tokenURI).to.equal(`${BASE_IPFS_URI}0`);
+  });
 });
