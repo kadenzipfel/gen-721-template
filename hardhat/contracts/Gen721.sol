@@ -8,21 +8,27 @@ import "./lib/Strings.sol";
 contract Gen721 is CustomERC721Metadata, Ownable {
     using SafeMath for uint256;
 
-    // Mint price of 0.05 eth
-    uint public MINT_PRICE = 5*10**16;
-    // Max supply of 500 tokens
-    uint public MAX_SUPPLY = 500;
+    uint public mintPrice;
+    uint public maxSupply;
     string baseIpfsUri;
     uint public nextTokenId = 0;
     mapping(uint => bytes32) tokenIdToHash;
 
-    constructor(string memory _tokenName, string memory _tokenSymbol, string memory _baseIpfsUri) CustomERC721Metadata(_tokenName, _tokenSymbol) public {
+    constructor(
+        string memory _tokenName, 
+        string memory _tokenSymbol, 
+        string memory _baseIpfsUri, 
+        uint _mintPrice,
+        uint _maxSupply
+    ) CustomERC721Metadata(_tokenName, _tokenSymbol) public {
         baseIpfsUri = _baseIpfsUri;
+        mintPrice = _mintPrice;
+        maxSupply = _maxSupply;
     }
 
     function mint(uint amount) external payable {
-        require(totalSupply().add(amount) <= MAX_SUPPLY, "exceeds max supply");
-        require(msg.value >= MINT_PRICE.mul(amount), "insufficient value");
+        require(totalSupply().add(amount) <= maxSupply, "exceeds max supply");
+        require(msg.value >= mintPrice.mul(amount), "insufficient value");
 
         for (uint i = 0; i < amount; i++) {
             _mintToken();
@@ -61,6 +67,7 @@ contract Gen721 is CustomERC721Metadata, Ownable {
     }
 
     function withdraw() public onlyOwner {
-        require(payable(msg.sender).send(address(this).balance));
+        address payable sender = address(msg.sender);
+        require(sender.send(address(this).balance));
     }
 }   
