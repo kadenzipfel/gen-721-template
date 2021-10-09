@@ -5,6 +5,7 @@ import { ethers } from "hardhat";
 describe("Gen721", () => {
   const TOKEN_NAME = "Gen721";
   const TOKEN_SYMBOL = "GEN";
+  const BASE_IPFS_URI = "gateway.ipfs.io/ipfs/example/";
   let owner, user, Gen721;
   beforeEach(async () => {
     [owner, user] = await ethers.getSigners();
@@ -12,7 +13,7 @@ describe("Gen721", () => {
     Gen721 = await Gen721Factory.deploy(
       TOKEN_NAME,
       TOKEN_SYMBOL,
-      "gateway.ipfs.io/ipfs/example/",
+      BASE_IPFS_URI,
       parseUnits("0.05", "ether"),
       5000
     );
@@ -23,5 +24,10 @@ describe("Gen721", () => {
     const tokenSymbol = await Gen721.symbol();
     expect(tokenName).to.equal(TOKEN_NAME);
     expect(tokenSymbol).to.equal(TOKEN_SYMBOL);
+  });
+
+  it("sets base ipfs uri", async () => {
+    const baseIpfsUri = await Gen721.baseIpfsUri();
+    expect(baseIpfsUri).to.equal(BASE_IPFS_URI);
   });
 });
