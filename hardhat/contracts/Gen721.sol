@@ -12,7 +12,8 @@ contract Gen721 is CustomERC721Metadata, Ownable {
     uint public maxSupply;
     string public baseIpfsUri;
     uint public nextTokenId = 0;
-    mapping(uint => bytes32) tokenIdToHash;
+    mapping(uint => bytes32) public tokenIdToHash;
+    mapping(bytes32 => uint) public hashToTokenId;
 
     constructor(
         string memory _tokenName, 
@@ -42,6 +43,7 @@ contract Gen721 is CustomERC721Metadata, Ownable {
         bytes32 hash = keccak256(abi.encodePacked(tokenIdToBe, block.number, blockhash(block.number - 1), msg.sender));
 
         tokenIdToHash[tokenIdToBe] = hash;
+        hashToTokenId[hash] = tokenIdToBe;
 
         _mint(msg.sender, tokenIdToBe);
     }
@@ -51,19 +53,7 @@ contract Gen721 is CustomERC721Metadata, Ownable {
     }
 
     function tokenURI(uint _tokenId) external view returns (string memory) {
-        return Strings.strConcat(baseIpfsUri, bytes32ToString(tokenIdToHash[_tokenId]));
-    }
-
-    function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
-        uint8 i = 0;
-        while(i < 32 && _bytes32[i] != 0) {
-            i++;
-        }
-        bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
+        return Strings.strConcat(baseIpfsUri, Strings.uint2str(_tokenId));
     }
 
     function withdraw() public onlyOwner {
