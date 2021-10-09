@@ -77,4 +77,25 @@ describe("Gen721", () => {
     const tokenURI = await Gen721.tokenURI(0);
     expect(tokenURI).to.equal(`${BASE_IPFS_URI}0`);
   });
+
+  it("allows owner to withdraw eth", async () => {
+    const ownerBalanceBefore = await ethers.provider.getBalance(owner.address);
+    console.log(ownerBalanceBefore);
+
+    const numTokens = 17;
+    await Gen721.connect(user).mint(numTokens, {
+      value: MINT_PRICE.mul(numTokens),
+    });
+
+    await Gen721.connect(owner).withdraw();
+
+    const ownerBalanceAfter = await ethers.provider.getBalance(owner.address);
+    console.log(ownerBalanceAfter);
+
+    expect(ownerBalanceAfter).to.gte(
+      (await ownerBalanceBefore).add(
+        MINT_PRICE.mul(numTokens).sub(parseUnits("0.01", "ether"))
+      )
+    );
+  });
 });
