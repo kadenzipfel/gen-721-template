@@ -10,7 +10,7 @@ contract Gen721 is CustomERC721Metadata, Ownable {
 
     uint public mintPrice;
     uint public maxSupply;
-    string baseIpfsUri;
+    string public baseIpfsUri;
     uint public nextTokenId = 0;
     mapping(uint => bytes32) tokenIdToHash;
 
