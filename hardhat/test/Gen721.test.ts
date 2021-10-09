@@ -54,12 +54,21 @@ describe("Gen721", () => {
     expect(userBalance).to.equal(1);
   });
 
-  it("mints many token to user", async () => {
+  it("mints many tokens to user", async () => {
     const numTokens = 17;
     await Gen721.connect(user).mint(numTokens, {
       value: MINT_PRICE.mul(numTokens),
     });
     const userBalance = await Gen721.balanceOf(user.address);
     expect(userBalance).to.equal(numTokens);
+  });
+
+  it("doesn't mint tokens for less than mint price", async () => {
+    const numTokens = 17;
+    await expect(
+      Gen721.connect(user).mint(numTokens, {
+        value: MINT_PRICE.mul(numTokens - 1),
+      })
+    ).to.be.reverted;
   });
 });
