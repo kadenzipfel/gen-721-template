@@ -7,6 +7,8 @@ describe("Gen721", () => {
   const TOKEN_SYMBOL = "GEN";
   const BASE_IPFS_URI = "gateway.ipfs.io/ipfs/example/";
   const MINT_PRICE = parseUnits("0.05", "ether");
+  const MAX_SUPPLY = 5000;
+  const MAX_PER_USER = 5;
   let owner, user, Gen721;
   beforeEach(async () => {
     [owner, user] = await ethers.getSigners();
@@ -16,7 +18,8 @@ describe("Gen721", () => {
       TOKEN_SYMBOL,
       BASE_IPFS_URI,
       MINT_PRICE,
-      5000
+      MAX_SUPPLY,
+      MAX_PER_USER
     );
   });
 
@@ -55,7 +58,7 @@ describe("Gen721", () => {
   });
 
   it("mints many tokens to user", async () => {
-    const numTokens = 17;
+    const numTokens = 5;
     await Gen721.connect(user).mint(numTokens, {
       value: MINT_PRICE.mul(numTokens),
     });
@@ -64,10 +67,23 @@ describe("Gen721", () => {
   });
 
   it("doesn't mint tokens for less than mint price", async () => {
-    const numTokens = 17;
+    const numTokens = 5;
     await expect(
       Gen721.connect(user).mint(numTokens, {
         value: MINT_PRICE.mul(numTokens - 1),
+      })
+    ).to.be.reverted;
+  });
+
+  it("doesn't allow user to mint more than max per user", async () => {
+    const numTokens = 3;
+    await Gen721.connect(user).mint(numTokens, {
+      value: MINT_PRICE.mul(numTokens),
+    });
+
+    await expect(
+      Gen721.connect(user).mint(numTokens, {
+        value: MINT_PRICE.mul(numTokens),
       })
     ).to.be.reverted;
   });
@@ -81,7 +97,7 @@ describe("Gen721", () => {
   it("allows owner to withdraw eth", async () => {
     const ownerBalanceBefore = await ethers.provider.getBalance(owner.address);
 
-    const numTokens = 17;
+    const numTokens = 5;
     await Gen721.connect(user).mint(numTokens, {
       value: MINT_PRICE.mul(numTokens),
     });
