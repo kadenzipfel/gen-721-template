@@ -10,6 +10,7 @@ contract Gen721 is CustomERC721Metadata, Ownable {
 
     uint public mintPrice;
     uint public maxSupply;
+    uint public maxPerUser;
     string public baseIpfsUri;
     uint public nextTokenId = 0;
     mapping(uint => bytes32) public tokenIdToHash;
@@ -20,16 +21,19 @@ contract Gen721 is CustomERC721Metadata, Ownable {
         string memory _tokenSymbol, 
         string memory _baseIpfsUri, 
         uint _mintPrice,
-        uint _maxSupply
+        uint _maxSupply,
+        uint _maxPerUser
     ) CustomERC721Metadata(_tokenName, _tokenSymbol) public {
         baseIpfsUri = _baseIpfsUri;
         mintPrice = _mintPrice;
         maxSupply = _maxSupply;
+        maxPerUser = _maxPerUser;
     }
 
     function mint(uint amount) external payable {
         require(totalSupply().add(amount) <= maxSupply, "exceeds max supply");
         require(msg.value >= mintPrice.mul(amount), "insufficient value");
+        require(balanceOf(msg.sender).add(amount) <= maxPerUser, "exceeds max per user");
 
         for (uint i = 0; i < amount; i++) {
             _mintToken();
