@@ -7,11 +7,11 @@ describe("Gen721", () => {
   const TOKEN_SYMBOL = "GEN";
   const BASE_IPFS_URI = "gateway.ipfs.io/ipfs/example/";
   const MINT_PRICE = parseUnits("0.05", "ether");
-  const MAX_SUPPLY = 5000;
+  const MAX_SUPPLY = 10;
   const MAX_PER_USER = 5;
-  let owner, user, Gen721;
+  let owner, user, user2, user3, Gen721;
   beforeEach(async () => {
-    [owner, user] = await ethers.getSigners();
+    [owner, user, user2, user3] = await ethers.getSigners();
     const Gen721Factory = await ethers.getContractFactory("Gen721");
     Gen721 = await Gen721Factory.deploy(
       TOKEN_NAME,
@@ -83,6 +83,23 @@ describe("Gen721", () => {
 
     await expect(
       Gen721.connect(user).mint(numTokens, {
+        value: MINT_PRICE.mul(numTokens),
+      })
+    ).to.be.reverted;
+  });
+
+  it("doesn't allow mint if exceeds max supply", async () => {
+    const numTokens = 5;
+    await Gen721.connect(user).mint(numTokens, {
+      value: MINT_PRICE.mul(numTokens),
+    });
+
+    await Gen721.connect(user2).mint(numTokens, {
+      value: MINT_PRICE.mul(numTokens),
+    });
+
+    await expect(
+      Gen721.connect(user3).mint(numTokens, {
         value: MINT_PRICE.mul(numTokens),
       })
     ).to.be.reverted;
