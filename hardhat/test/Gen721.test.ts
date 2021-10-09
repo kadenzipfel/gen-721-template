@@ -30,4 +30,9 @@ describe("Gen721", () => {
     const baseIpfsUri = await Gen721.baseIpfsUri();
     expect(baseIpfsUri).to.equal(BASE_IPFS_URI);
   });
+
+  it("sets correct owner", async () => {
+    const contractOwner = await Gen721.owner();
+    expect(contractOwner).to.equal(owner.address);
+  });
 });
