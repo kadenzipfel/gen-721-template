@@ -6,6 +6,7 @@ describe("Gen721", () => {
   const TOKEN_NAME = "Gen721";
   const TOKEN_SYMBOL = "GEN";
   const BASE_IPFS_URI = "gateway.ipfs.io/ipfs/example/";
+  const MINT_PRICE = parseUnits("0.05", "ether");
   let owner, user, Gen721;
   beforeEach(async () => {
     [owner, user] = await ethers.getSigners();
@@ -14,7 +15,7 @@ describe("Gen721", () => {
       TOKEN_NAME,
       TOKEN_SYMBOL,
       BASE_IPFS_URI,
-      parseUnits("0.05", "ether"),
+      MINT_PRICE,
       5000
     );
   });
@@ -45,5 +46,11 @@ describe("Gen721", () => {
 
   it("doesn't update base ipfs uri if not owner", async () => {
     await expect(Gen721.connect(user).updateBaseIpfsUri()).to.be.reverted;
+  });
+
+  it("mints token to user", async () => {
+    await Gen721.connect(user).mint(1, { value: MINT_PRICE });
+    const userBalance = await Gen721.balanceOf(user.address);
+    expect(userBalance).to.equal(1);
   });
 });
