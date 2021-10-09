@@ -38,7 +38,7 @@ describe("Gen721", () => {
 
   it("updates ipfs base uri", async () => {
     const newBaseIpfsUri = "gateway.ipfs.io/ipfs/example-new/";
-    await Gen721.updateBaseIpfsUri(newBaseIpfsUri);
+    await Gen721.connect(owner).updateBaseIpfsUri(newBaseIpfsUri);
     const baseIpfsUri = await Gen721.baseIpfsUri();
     expect(baseIpfsUri).to.equal(newBaseIpfsUri);
   });
