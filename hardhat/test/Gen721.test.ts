@@ -42,4 +42,8 @@ describe("Gen721", () => {
     const baseIpfsUri = await Gen721.baseIpfsUri();
     expect(baseIpfsUri).to.equal(newBaseIpfsUri);
   });
+
+  it("doesn't update base ipfs uri if not owner", async () => {
+    await expect(Gen721.connect(user).updateBaseIpfsUri()).to.be.reverted;
+  });
 });
